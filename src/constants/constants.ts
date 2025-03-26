@@ -10,11 +10,11 @@ export interface CookieOptions {
 
 // Constants
 export const CONSTANTS = {
-  FRONTEND_URL: ["http://localhost:5173"],
+  FRONTEND_URL: ["http://localhost:5173", "https://erasify-client.vercel.app"],
   ACCESS_TOKEN: "erasify_access_token",
   REFRESH_TOKEN: "erasify_refresh_token",
   UUID: "erasify_uuid",
-} ;
+}; ;
 
 // API Routes 
 export const API_ROUTES = {
