@@ -20,39 +20,52 @@ const saltRounds = 10;
 
 const register = async (req: Request, res: Response): Promise<void> => {
   try {
-    debugger
+    debugger;
     const { email, password, lastName, firstName } = req.body;
-    const { uuid } = req.cookies;
+    let { uuid } = req.cookies; // Get UUID from cookies
 
+    // Check if the user already exists
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       res.status(400).json({ success: false, message: "User already exists" });
       return;
     }
 
-    const guestUser = await GuestUser.findOne({ uuid });
+    let guestUser = await GuestUser.findOne({ uuid });
 
+    // If no guest user found, create a new guest user and assign a UUID
     if (!guestUser) {
-      res.status(400).json({ success: false, message: "UUID user not found" });
-      return;
+      uuid = crypto.randomUUID(); // Generate new UUID
+      guestUser = new GuestUser({ uuid, credits: 1 });
+      await guestUser.save();
+
+      // Set the new UUID in cookies
+      res.cookie("uuid", uuid, {
+        httpOnly: true,
+        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days expiry
+      });
     }
 
+    // Hash the password
     const hashPassword = await bcrypt.hash(password, saltRounds);
 
+    // Create new user and sync guest credits
     const user = new User({
       firstName,
       lastName,
       email,
       password: hashPassword,
       credits: guestUser.credits,
-      uuid,
+      uuid, // Assign the guest UUID
     });
 
     await user.save();
 
+    // Generate access & refresh tokens
     const accessToken = generateAccessToken(user._id.toString());
     const refreshToken = generateRefreshToken(user._id.toString());
 
+    // Set authentication cookies
     res.cookie(CONSTANTS.ACCESS_TOKEN, accessToken, COOKIE_OPTIONS.accessToken);
     res.cookie(
       CONSTANTS.REFRESH_TOKEN,
@@ -129,6 +142,7 @@ const logout = async (req: Request, res: Response): Promise<void> => {
   try {
     res.clearCookie(CONSTANTS.ACCESS_TOKEN, COOKIE_OPTIONS.clearAccessToken);
     res.clearCookie(CONSTANTS.REFRESH_TOKEN, COOKIE_OPTIONS.clearRefreshToken);
+    res.clearCookie(CONSTANTS.UUID, COOKIE_OPTIONS.uuid);
 
     res.status(200).json({ message: "Logged out successfully" });
   } catch (error) {
