@@ -44,7 +44,7 @@ const register = async (req: Request, res: Response): Promise<void> => {
       lastName,
       email,
       password: hashPassword,
-      credit: guestUser.credit,
+      credits: guestUser.credits,
       uuid,
     });
 

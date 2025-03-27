@@ -7,7 +7,7 @@ export interface User {
   email: string;
   password: string;
   createdAt: string;
-  credit: string;
+  credits: string;
 }
 
 const guestUserSchema = new mongoose.Schema({
@@ -19,7 +19,7 @@ const guestUserSchema = new mongoose.Schema({
     type : String,
     default : 'guest'
   },
-  credit: {
+  credits: {
     type: Number,
     default: 5,
   },

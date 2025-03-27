@@ -2,8 +2,6 @@ import express, { Application } from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import connection from "./database/connection";
-import fs from "fs";
-import https from "https";
 import cookieParser from "cookie-parser";
 import { upload } from "./middleware/multer.middleware";
 import { CONSTANTS, API_ROUTES } from "./constants/constants";
@@ -11,6 +9,7 @@ import { CONSTANTS, API_ROUTES } from "./constants/constants";
 // Modules
 import authRoutes from "./routes/auth.route";
 import featureRoute from "./routes/feature.route";
+import paymentRoute from './routes/payment.route'
 
 // Configuration
 dotenv.config();
@@ -48,9 +47,10 @@ async function startServer() {
     await connection(url);
     console.log("Database connected successfully");
 
-    // Define routes **after** database connection
+    // Define routes database connection
     app.use(API_ROUTES.AUTH, upload.none(), authRoutes);
     app.use(API_ROUTES.FEATURES, featureRoute);
+    app.use(API_ROUTES.BASE, paymentRoute);
 
     app.listen(PORT, () => {
       console.log(`Secure server running on http://localhost:${PORT}`);

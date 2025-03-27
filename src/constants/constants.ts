@@ -18,6 +18,7 @@ export const CONSTANTS = {
 
 // API Routes 
 export const API_ROUTES = {
+  BASE: "/api/v1/",
   AUTH: "/api/v1/auth",
   FEATURES: "/api/v1/features",
 } as const;

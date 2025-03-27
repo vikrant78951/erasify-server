@@ -74,7 +74,7 @@ const getUserData = (user: any) => ({
   email: user.email,
   firstName: user.firstName,
   lastName: user.lastName,
-  credit: user.credit
+  credits: user.credits
 });
 
 const verifyAccessToken =  (token : string) => {

@@ -11,7 +11,7 @@ interface AuthenticatedRequest extends Request {
   user?: {
     _id: string;
     email?: string;
-    credit: number;
+    credits: number;
     role: string;
   };
 }
@@ -25,12 +25,14 @@ req: AuthenticatedRequest,
   next: NextFunction
 ) => {
   try {
-    let accessToken = req.cookies.accessToken;
-    const refreshToken = req.cookies.refreshToken;
+
+    let accessToken = req.cookies.erasify_access_token;
+    const refreshToken = req.cookies.erasify_refresh_token;
     const uuid = req.cookies.uuid;
 
     if (!accessToken && !refreshToken && !uuid) {
-      res.status(401).json({ success: false, message: "Unauthorized" });
+      res.status(401).json({ success: false, message: "Unauthorized User" });
+      return
     }
 
     if (accessToken) {
@@ -41,7 +43,7 @@ req: AuthenticatedRequest,
           req.user = {
             _id: user._id.toString(),
             email: user.email,
-            credit: user.credit,
+            credits: user.credits,
             role: user.role,
           };
           next();
@@ -58,7 +60,7 @@ req: AuthenticatedRequest,
           req.user = {
             _id: user._id.toString(),
             email: user.email,
-            credit: user.credit,
+            credits: user.credits,
             role: user.role,
           };
           next();
@@ -72,7 +74,7 @@ req: AuthenticatedRequest,
       if (user) {
         req.user = {
           _id: user._id.toString(),
-          credit: user.credit,
+          credits: user.credits,
           role: user.role,
         };
         next();
@@ -82,10 +84,9 @@ req: AuthenticatedRequest,
 
     res.status(400).json({
       status: false,
-      message: "Unauthorized",
+      message: "Unauthorized User",
     });
-  
-
+    return
   } catch (error) {
      res.status(400).json({
        status: false,
